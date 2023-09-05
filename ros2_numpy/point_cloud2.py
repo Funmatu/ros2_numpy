@@ -86,7 +86,7 @@ def array_to_point_cloud2(np_array, frame_id='base_link'):
                           datatype=PointField.UINT16, count=1))
     msg.is_bigendian = sys.byteorder != 'little'
     # Check if message is dense
-    msg.is_dense = not np.isnan(np_array["xyz"]).any()
+    msg.is_dense = not np.isnan(np.c_[np_array["x"], np_array["y"], np_array["z"]]).any() # not np.isnan(np_array["xyz"]).any()
 
     # Calculate the point_step and row_step
     if rgb_flag and intensity_flag:
@@ -104,19 +104,19 @@ def array_to_point_cloud2(np_array, frame_id='base_link'):
     # Here we create an array.array object using a memoryview, limiting copying and
     # increasing performance.
     if rgb_flag and intensity_flag:
-        memory_view = memoryview(np.hstack(np_array["xyz"].astype(np.float32).tobytes(
+        memory_view = memoryview(np.hstack(np.c_[np_array["x"], np_array["y"], np_array["z"]].astype(np.float32).tobytes(
         ), np_array["rgb"].astype(np.uint32).tobytes(), np_array["intensity"].astype(np.uint16).tobytes()))
 
     if rgb_flag and not intensity_flag:
-        memory_view = memoryview(np.hstack((np_array["xyz"].astype(np.float32).tobytes(
+        memory_view = memoryview(np.hstack((np.c_[np_array["x"], np_array["y"], np_array["z"]].astype(np.float32).tobytes(
         ), np_array["rgb"].astype(np.uint32).tobytes())))
 
     if not rgb_flag and intensity_flag:
-        memory_view = memoryview(np.hstack(np_array["xyz"].astype(np.float32).tobytes(
+        memory_view = memoryview(np.hstack(np.c_[np_array["x"], np_array["y"], np_array["z"]].astype(np.float32).tobytes(
         ), np_array["intensity"].astype(np.uint16).tobytes()))
     
     if not rgb_flag and not intensity_flag:
-        memory_view = memoryview(np_array["xyz"].astype(np.float32).tobytes())
+        memory_view = memoryview(np.c_[np_array["x"], np_array["y"], np_array["z"]].astype(np.float32).tobytes())
 
     if memory_view.nbytes > 0:
         array_bytes = memory_view.cast("B")
