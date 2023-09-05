@@ -98,7 +98,7 @@ def array_to_point_cloud2(np_array, frame_id='base_link'):
 
     # msg.row_step = msg.point_step * msg.width
     msg.point_step = np_array.dtype.itemsize
-    msg.row_step = cloud_msg.point_step*np_array.shape[1]
+    msg.row_step = msg.point_step*np_array.shape[1]
 
     # The PointCloud2.data setter will create an array.array object for you if you don't
     # provide it one directly. This causes very slow performance because it iterates
