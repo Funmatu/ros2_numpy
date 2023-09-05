@@ -104,34 +104,43 @@ def array_to_point_cloud2(np_array, frame_id=None):
     msg.point_step = np_array.dtype.itemsize
     msg.row_step = msg.point_step*np_array.shape[1]
 
-    # The PointCloud2.data setter will create an array.array object for you if you don't
-    # provide it one directly. This causes very slow performance because it iterates
-    # over each byte in python.
-    # Here we create an array.array object using a memoryview, limiting copying and
-    # increasing performance.
-    if rgb_flag and intensity_flag:
-        memory_view = memoryview(np.hstack(np.c_[np_array["x"], np_array["y"], np_array["z"]].astype(np.float32).tobytes(
-        ), np_array["rgb"].astype(np.uint32).tobytes(), np_array["intensity"].astype(np.uint16).tobytes()))
-
-    if rgb_flag and not intensity_flag:
-        memory_view = memoryview(np.hstack((np.c_[np_array["x"], np_array["y"], np_array["z"]].astype(np.float32).tobytes(
-        ), np_array["rgb"].astype(np.uint32).tobytes())))
-
-    if not rgb_flag and intensity_flag:
-        memory_view = memoryview(np.hstack(np.c_[np_array["x"], np_array["y"], np_array["z"]].astype(np.float32).tobytes(
-        ), np_array["intensity"].astype(np.uint16).tobytes()))
-    
-    if not rgb_flag and not intensity_flag:
-        memory_view = memoryview(np.c_[np_array["x"], np_array["y"], np_array["z"]].astype(np.float32).tobytes())
-
+    memory_view = memoryview(np_array)
     if memory_view.nbytes > 0:
         array_bytes = memory_view.cast("B")
     else:
         # Casting raises a TypeError if the array has no elements
         array_bytes = b""
-
     as_array = array.array("B")
     as_array.frombytes(array_bytes)
     msg.data = as_array
+    # The PointCloud2.data setter will create an array.array object for you if you don't
+    # provide it one directly. This causes very slow performance because it iterates
+    # over each byte in python.
+    # Here we create an array.array object using a memoryview, limiting copying and
+    # increasing performance.
+    # if rgb_flag and intensity_flag:
+    #     memory_view = memoryview(np.hstack(np.c_[np_array["x"], np_array["y"], np_array["z"]].astype(np.float32).tobytes(
+    #     ), np_array["rgb"].astype(np.uint32).tobytes(), np_array["intensity"].astype(np.uint16).tobytes()))
+    # 
+    # if rgb_flag and not intensity_flag:
+    #     memory_view = memoryview(np.hstack((np.c_[np_array["x"], np_array["y"], np_array["z"]].astype(np.float32).tobytes(
+    #     ), np_array["rgb"].astype(np.uint32).tobytes())))
+    # 
+    # if not rgb_flag and intensity_flag:
+    #     memory_view = memoryview(np.hstack(np.c_[np_array["x"], np_array["y"], np_array["z"]].astype(np.float32).tobytes(
+    #     ), np_array["intensity"].astype(np.uint16).tobytes()))
+    # 
+    # if not rgb_flag and not intensity_flag:
+    #     memory_view = memoryview(np.c_[np_array["x"], np_array["y"], np_array["z"]].astype(np.float32).tobytes())
+    # 
+    # if memory_view.nbytes > 0:
+    #     array_bytes = memory_view.cast("B")
+    # else:
+    #     # Casting raises a TypeError if the array has no elements
+    #     array_bytes = b""
+    # 
+    # as_array = array.array("B")
+    # as_array.frombytes(array_bytes)
+    # msg.data = as_array
 
     return msg
