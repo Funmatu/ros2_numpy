@@ -62,8 +62,8 @@ def array_to_point_cloud2(np_array, frame_id='base_link'):
     and can optionally have a "rgb" field and a "intensity" field.
     """
     # Check if the "rgb" field is present
-    rgb_flag = "rgb" in np_array.keys()
-    intensity_flag = "intensity" in np_array.keys()
+    rgb_flag = "rgb" in np_array.dtype.names # np_array.keys()
+    intensity_flag = "intensity" in np_array.dtype.names # np_array.keys()
 
     # Create the PointCloud2 message
     msg = PointCloud2()
