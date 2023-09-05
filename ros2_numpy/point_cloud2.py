@@ -56,7 +56,7 @@ def point_cloud2_to_array(msg):
 
 
 @converts_from_numpy(PointCloud2)
-def array_to_point_cloud2(np_array, frame_id='base_link'):
+def array_to_point_cloud2(np_array, frame_id=None):
     """
     Convert a numpy array to a PointCloud2 message. The numpy array must have a "xyz" field
     and can optionally have a "rgb" field and a "intensity" field.
@@ -67,26 +67,30 @@ def array_to_point_cloud2(np_array, frame_id='base_link'):
 
     # Create the PointCloud2 message
     msg = PointCloud2()
-    msg.header.frame_id = frame_id
+    if frame_id is not None:
+        msg.header.frame_id = frame_id
     current_time = time.time()
     msg.header.stamp.sec = int(current_time)
     msg.header.stamp.nanosec = int((current_time - msg.header.stamp.sec) * 1e9)
-    msg.height = 1
-    msg.width = np.c_[np_array["x"], np_array["y"], np_array["z"]].shape[0] # np_array["xyz"].shape[0]
+    msg.height = np_array.shape[0]
+    msg.width = np_array.shape[1]
+    msg.is_bigendian = sys.byteorder != 'little'
     msg.fields = [
         PointField(name='x', offset=0, datatype=PointField.FLOAT32, count=1),
         PointField(name='y', offset=4, datatype=PointField.FLOAT32, count=1),
-        PointField(name='z', offset=8, datatype=PointField.FLOAT32, count=1)]
+        PointField(name='z', offset=8, datatype=PointField.FLOAT32, count=1),
+        PointField(name="normal_x", offset=16, datatype=PointField.FLOAT32, count=1),
+        PointField(name="normal_y", offset=20, datatype=PointField.FLOAT32, count=1),
+        PointField(name="normal_z", offset=24, datatype=PointField.FLOAT32, count=1),
+        PointField(name="curvature", offset=32, datatype=PointField.FLOAT32, count=1)
+    ]
 
     if rgb_flag:
-        msg.fields.append(PointField(name='rgb', offset=12,
-                          datatype=PointField.UINT32, count=1))
-    if intensity_flag:
-        msg.fields.append(PointField(name='intensity', offset=16,
-                          datatype=PointField.UINT16, count=1))
+        msg.fields.append(PointField(name='rgb', offset=12, datatype=PointField.UINT32, count=1))
+
     msg.is_bigendian = sys.byteorder != 'little'
     # Check if message is dense
-    msg.is_dense = not np.isnan(np.c_[np_array["x"], np_array["y"], np_array["z"]]).any() # not np.isnan(np_array["xyz"]).any()
+    msg.is_dense = all([np.isfinite(np_array[fname]).all() for fname in cloud_arr.dtype.names])
 
     # Calculate the point_step and row_step
     # if rgb_flag and intensity_flag:
