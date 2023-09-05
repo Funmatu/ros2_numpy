@@ -90,7 +90,7 @@ def array_to_point_cloud2(np_array, frame_id=None):
 
     msg.is_bigendian = sys.byteorder != 'little'
     # Check if message is dense
-    msg.is_dense = all([np.isfinite(np_array[fname]).all() for fname in cloud_arr.dtype.names])
+    msg.is_dense = all([np.isfinite(np_array[fname]).all() for fname in np_array.dtype.names])
 
     # Calculate the point_step and row_step
     # if rgb_flag and intensity_flag:
