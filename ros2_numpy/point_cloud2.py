@@ -89,14 +89,16 @@ def array_to_point_cloud2(np_array, frame_id='base_link'):
     msg.is_dense = not np.isnan(np.c_[np_array["x"], np_array["y"], np_array["z"]]).any() # not np.isnan(np_array["xyz"]).any()
 
     # Calculate the point_step and row_step
-    if rgb_flag and intensity_flag:
-        msg.point_step = 18
-    if rgb_flag and not intensity_flag:
-        msg.point_step = 16
-    if not rgb_flag and intensity_flag:
-        msg.point_step = 14
+    # if rgb_flag and intensity_flag:
+    #     msg.point_step = 18
+    # if rgb_flag and not intensity_flag:
+    #     msg.point_step = 16
+    # if not rgb_flag and intensity_flag:
+    #     msg.point_step = 14
 
-    msg.row_step = msg.point_step * msg.width
+    # msg.row_step = msg.point_step * msg.width
+    msg.point_step = np_array.dtype.itemsize
+    msg.row_step = cloud_msg.point_step*np_array.shape[1]
 
     # The PointCloud2.data setter will create an array.array object for you if you don't
     # provide it one directly. This causes very slow performance because it iterates
