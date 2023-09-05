@@ -72,7 +72,7 @@ def array_to_point_cloud2(np_array, frame_id='base_link'):
     msg.header.stamp.sec = int(current_time)
     msg.header.stamp.nanosec = int((current_time - msg.header.stamp.sec) * 1e9)
     msg.height = 1
-    msg.width = np_array["xyz"].shape[0]
+    msg.width = np.c_[np_array["x"], np_array["y"], np_array["z"]].shape[0] # np_array["xyz"].shape[0]
     msg.fields = [
         PointField(name='x', offset=0, datatype=PointField.FLOAT32, count=1),
         PointField(name='y', offset=4, datatype=PointField.FLOAT32, count=1),
