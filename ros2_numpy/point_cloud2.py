@@ -41,7 +41,7 @@ def point_cloud2_to_array(msg):
         r = np.asarray((rgb >> 16) & 255, dtype='u1')
         g = np.asarray((rgb >> 8) & 255, dtype='u1')
         b = np.asarray(rgb & 255, dtype='u1')
-        rgb = np.concatenate((r, g, b), axis=2)
+        rgb = np.c_[r, g, b] # np.concatenate((r, g, b), axis=2)
     if intensity_flag:
         intensity = pc_data[:, intensity_idx:intensity_idx +
                             2].view(dtype='u2')
