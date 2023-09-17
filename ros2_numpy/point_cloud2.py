@@ -20,7 +20,7 @@ def point_cloud2_to_array(msg):
     field_names = [field.name for field in msg.fields]
     # Check if the "rgb" field is present
     if "rgb" in field_names:
-        rgb_idx = field_names.index("rgb")
+        rgb_idx = 12 # offsets: 12 # field_names.index("rgb")
         rgb_flag = True
     else:
         rgb_flag = False
@@ -35,17 +35,17 @@ def point_cloud2_to_array(msg):
     pc_data = np.frombuffer(msg.data, dtype='u1').reshape(-1, msg.point_step)
     xyz = pc_data[:, 0:12].view(dtype='f4').reshape(-1, 3)
     if rgb_flag:
-        rgb = pc_data[:, rgb_idx:rgb_idx+3][:, ::-1]
+        # rgb = pc_data[:, rgb_idx:rgb_idx+3][:, ::-1]
+        rgb = pc_data[:, rgb_idx:rgb_idx+3]
     if intensity_flag:
-        intensity = pc_data[:, intensity_idx:intensity_idx +
-                            2].view(dtype='u2')
+        intensity = pc_data[:, intensity_idx:intensity_idx+2].view(dtype='u2')
 
     # return the arrays in a dictionary
     if rgb_flag and intensity_flag:
         return {"xyz": xyz, "rgb": rgb, "intensity": intensity}
 
     if rgb_flag and not intensity_flag:
-        return {"xyz": xyz, "rgb": rgb, "pc_data": pc_data}
+        return {"xyz": xyz, "rgb": rgb}
 
     if not rgb_flag and intensity_flag:
         return {"xyz": xyz, "intensity": intensity}
