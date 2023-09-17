@@ -35,8 +35,7 @@ def point_cloud2_to_array(msg):
     pc_data = np.frombuffer(msg.data, dtype='u1').reshape(-1, msg.point_step)
     xyz = pc_data[:, 0:12].view(dtype='f4').reshape(-1, 3)
     if rgb_flag:
-        # rgb = pc_data[:, rgb_idx:rgb_idx+3][:, ::-1]
-        rgb = pc_data[:, rgb_idx:rgb_idx+3]
+        rgb = pc_data[:, rgb_idx:rgb_idx+3][:, ::-1]
     if intensity_flag:
         intensity = pc_data[:, intensity_idx:intensity_idx+2].view(dtype='u2')
 
