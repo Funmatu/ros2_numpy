@@ -32,16 +32,10 @@ def point_cloud2_to_array(msg):
         intensity_flag = False
 
     # Convert the PointCloud2 message to a NumPy array
-    pc_data = np.frombuffer(
-        msg.data, dtype=np.uint8).reshape(-1, msg.point_step)
-    xyz = pc_data[:, 0:12].view(dtype=np.float32).reshape(-1, 3)
+    pc_data = np.frombuffer(msg.data, dtype='u1').reshape(-1, msg.point_step)
+    xyz = pc_data[:, 0:12].view(dtype='f4').reshape(-1, 3)
     if rgb_flag:
-        # rgb = pc_data[:, rgb_idx:rgb_idx+3][:, ::-1]
-        rgb = pc_data[:, rgb_idx:rgb_idx+4][:, ::-1]
-        r = np.asarray((rgb >> 16) & 255, dtype='u1')
-        g = np.asarray((rgb >> 8) & 255, dtype='u1')
-        b = np.asarray(rgb & 255, dtype='u1')
-        rgb = np.c_[r, g, b] # np.concatenate((r, g, b), axis=2)
+        rgb = pc_data[:, rgb_idx:rgb_idx+3][:, ::-1]
     if intensity_flag:
         intensity = pc_data[:, intensity_idx:intensity_idx +
                             2].view(dtype='u2')
