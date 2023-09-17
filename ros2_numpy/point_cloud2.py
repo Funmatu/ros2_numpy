@@ -45,7 +45,7 @@ def point_cloud2_to_array(msg):
         return {"xyz": xyz, "rgb": rgb, "intensity": intensity}
 
     if rgb_flag and not intensity_flag:
-        return {"xyz": xyz, "rgb": rgb}
+        return {"xyz": xyz, "rgb": rgb, "pc_data": pc_data}
 
     if not rgb_flag and intensity_flag:
         return {"xyz": xyz, "intensity": intensity}
